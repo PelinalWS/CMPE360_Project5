@@ -246,8 +246,9 @@ def RT_trace_ray(scene, ray_orig, ray_dir, lights, depth=0):
         R_0 = ((1-mat.ior)/(1+mat.ior))**2 
         #
         # Calculate reflectivity k_r = R_0 + (1 - R_0) (1 - cos(theta))^5 where theta is the incident angle.
+        # REPLACE WITH YOUR CODE reflectivity = mat.mirror_reflectivity
+        # Use the line below after checkpoint 4
         reflectivity = R_0+ (1 - R_0) * ((1 - np.cos(ray_dir.dot(hit_norm))) ** 5) 
-        # REPLACE WITH YOUR CODE
     #
     # Re-run this script, and render the scene to check your result with Checkpoint 5.
     # ----------
@@ -279,8 +280,9 @@ def RT_trace_ray(scene, ray_orig, ray_dir, lights, depth=0):
         # reflect_color = np.zeros(3) 
         # REPLACE WITH YOUR CODE
         # making new origin because of self-occlusion
-        new_orig = hit_loc + eps * ray_dir
-        L_reflect += RT_trace_ray(scene, hit_loc, D_reflect, lights, depth+1)
+        new_orig = hit_loc + eps * D_reflect
+        L_reflect = 0
+        L_reflect += RT_trace_ray(scene, new_orig, D_reflect, lights, depth-1)
         # Add reflection to the final color: k_r * L_reflect
         color += reflectivity * L_reflect
         #
