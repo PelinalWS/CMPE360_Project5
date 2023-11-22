@@ -243,12 +243,12 @@ def RT_trace_ray(scene, ray_orig, ray_dir, lights, depth=0):
         # n2 is the IOR of the object, you can read it from the material property using: mat.ior
         # FILL IN YOUR CODE
         #
-        k_r = ((1-mat.ior)/(1+mat.ior))**2 
+        R_0 = (((1-mat.ior)/(1+mat.ior))**2)
         #
         # Calculate reflectivity k_r = R_0 + (1 - R_0) (1 - cos(theta))^5 where theta is the incident angle.
         # REPLACE WITH YOUR CODE reflectivity = mat.mirror_reflectivity
-        # Use the line below after checkpoint 4
-        reflectivity = k_r+ (1 - k_r) * ((1 - np.cos(ray_dir.dot(hit_norm))) ** 5) 
+        # Use the line below after checkpoint 4 is rendered
+        k_reflectivity = R_0 + (1 - R_0) * ((1 - (np.cos(ray_dir.dot(hit_norm))))**5) 
     #
     # Re-run this script, and render the scene to check your result with Checkpoint 5.
     # ----------
@@ -313,12 +313,13 @@ def RT_trace_ray(scene, ray_orig, ray_dir, lights, depth=0):
                     sn = 1/mat.ior
                 else:
                     sn = mat.ior/1
-                root_val = (1 - sn**2 * (1 - (ray_dir.dot(hit_norm))**2))
+                root_val = (1 - ((sn**2) * (1 - ((ray_dir.dot(hit_norm))**2))))
                 if root_val > 0:
                     D_transmit = ray_dir * sn - hit_norm * (sn * ray_dir.dot(hit_norm) + sqrt(root_val))
-                    new_orig = hit_loc + D_transmit * eps
-                    L_transmit = RT_trace_ray(scene, new_orig, D_transmit, lights, depth-1)
-                    color += (1 - k_r) * mat.transmission * L_transmit
+                    new_orig = hit_loc - hit_norm * eps
+                    L_transmit = 0
+                    L_transmit += RT_trace_ray(scene, new_orig, D_transmit, lights, depth-1)
+                    color += (1 - k_reflectivity) * mat.transmission * L_transmit
                 # np.zeros(3) REPLACE WITH YOUR CODE
     #
     # Re-run this script, and render the scene to check your result with Checkpoint 6.
